@@ -447,8 +447,8 @@
           </div>
         </div>
         <div class="note" style="padding:0 18px 16px;">
-          <span class="en">Entries you add below are saved centrally and visible to <em>everyone who visits this site</em> — no import or export needed.</span>
-          <span class="te">మీరు దిగువన జోడించే ఎంట్రీలు కేంద్రంగా సేవ్ అయి, <em>ఈ సైట్‌ను సందర్శించే అందరికీ</em> కనిపిస్తాయి — దిగుమతి లేదా ఎగుమతి అవసరం లేదు.</span>
+          <span class="en">Entries you add below are saved centrally and visible to <em>everyone who visits this site</em>. You can remove entries you added yourself from this device — other people's entries can only be removed by them.</span>
+          <span class="te">మీరు దిగువన జోడించే ఎంట్రీలు కేంద్రంగా సేవ్ అయి, <em>ఈ సైట్‌ను సందర్శించే అందరికీ</em> కనిపిస్తాయి. మీరు ఈ పరికరం నుండి జోడించిన ఎంట్రీలను మీరే తీసివేయవచ్చు — ఇతరుల ఎంట్రీలను వారు మాత్రమే తీసివేయగలరు.</span>
         </div>
         <div class="report-form" id="report-form">
           <div class="grid">
@@ -736,6 +736,27 @@
   }
 
   /* ---------- storage helpers (shared, via serverless API) ---------- */
+  var MY_TOKENS_KEY = 'jalaMitra_myTokens_v1';
+
+  function myTokens(){
+    try{ return JSON.parse(localStorage.getItem(MY_TOKENS_KEY)) || {}; }
+    catch(e){ return {}; }
+  }
+  function rememberMyToken(id, token){
+    try{
+      var t = myTokens();
+      t[id] = token;
+      localStorage.setItem(MY_TOKENS_KEY, JSON.stringify(t));
+    }catch(e){ /* private browsing etc — delete just won't be offered next visit */ }
+  }
+  function forgetMyToken(id){
+    try{
+      var t = myTokens();
+      delete t[id];
+      localStorage.setItem(MY_TOKENS_KEY, JSON.stringify(t));
+    }catch(e){}
+  }
+
   async function loadBoard(){
     try{
       var res = await fetch('/api/board');
@@ -750,11 +771,18 @@
       body: JSON.stringify(entry)
     });
     if(!res.ok) throw new Error('failed to save');
-    return await res.json();
+    var saved = await res.json();
+    if(saved && saved.id && saved.ownerToken){
+      rememberMyToken(saved.id, saved.ownerToken);
+    }
+    return saved;
   }
   async function deleteBoardEntry(id){
-    var res = await fetch('/api/board?id=' + encodeURIComponent(id), { method:'DELETE' });
+    var token = myTokens()[id];
+    var url = '/api/board?id=' + encodeURIComponent(id) + '&token=' + encodeURIComponent(token || '');
+    var res = await fetch(url, { method:'DELETE' });
     if(!res.ok) throw new Error('failed to delete');
+    forgetMyToken(id);
   }
   async function loadReports(){
     try{
@@ -789,9 +817,10 @@
     var tagClass = source === 'demo' ? 'demo-tag' : 'local-tag';
     var tagEn = source === 'demo' ? 'demo' : 'shared';
     var tagTe = source === 'demo' ? 'మాదిరి' : 'పంచుకున్నది';
-    var delBtn = source === 'demo' ? '' :
+    var canDelete = source !== 'demo' && !!myTokens()[entry.id];
+    var delBtn = canDelete ?
       ' <button class="row-del" onclick="deleteRow(' + entry.id + ')">' +
-        '<span class="en">remove</span><span class="te">తీసివేయి</span></button>';
+        '<span class="en">remove</span><span class="te">తీసివేయి</span></button>' : '';
     return '<tr data-source="' + source + '" data-id="' + entry.id + '">' +
       '<td>' + escapeHtml(entry.village) + '</td>' +
       '<td>' + escapeHtml(entry.point) + '</td>' +
