@@ -61,9 +61,11 @@ function parseDMY(d: string): number {
 
 export default async (req: Request, context: Context) => {
   const store = getStore("jala-mitra-advisory");
+  const url0 = new URL(req.url);
+  const forceRefresh = url0.searchParams.get("refresh") === "1";
 
-  const cached = (await store.get("daily", { type: "json" })) as any;
-  if (cached && cached.fetchedAt && Date.now() - cached.fetchedAt < CACHE_MS) {
+  const cached = (await store.get("daily-v2", { type: "json" })) as any;
+  if (!forceRefresh && cached && cached.fetchedAt && Date.now() - cached.fetchedAt < CACHE_MS) {
     return new Response(JSON.stringify(cached), {
       headers: { "content-type": "application/json" },
     });
@@ -160,11 +162,13 @@ export default async (req: Request, context: Context) => {
             scope, // "market" = Anantapur itself, "district" = Anantapur district, "state" = AP-wide average
           }
         : null;
-    } catch {
+    } catch (err: any) {
       result.price = null;
+      result.priceError = String(err?.message || err);
     }
   } else {
     result.price = null;
+    result.priceError = "no API key configured";
   }
 
   // --- Pest advisory: rule-based from live weather signals ---
@@ -172,7 +176,7 @@ export default async (req: Request, context: Context) => {
     ? pestAdvisory(result.weather.humidity, result.weather.rainChance, result.weather.tempC)
     : null;
 
-  await store.setJSON("daily", result);
+  await store.setJSON("daily-v2", result);
 
   return new Response(JSON.stringify(result), {
     headers: { "content-type": "application/json" },
