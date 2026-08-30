@@ -580,30 +580,30 @@
         <div class="widget">
           <h4><span class="en">Today · Anantapur</span><span class="te">ఈరోజు · అనంతపురం</span></h4>
           <div class="weather-row">
-            <div class="temp">34°</div>
+            <div class="temp" id="adv-temp">—</div>
             <div class="desc">
-              <div><span class="en">Clear, hot</span><span class="te">స్పష్టం, వేడిగా</span></div>
-              <div class="meta"><span class="en">Rain chance: 8%</span><span class="te">వర్షం అవకాశం: 8%</span></div>
+              <div id="adv-condition"><span class="en">Loading…</span><span class="te">లోడ్ అవుతోంది…</span></div>
+              <div class="meta" id="adv-rain"></div>
             </div>
           </div>
         </div>
         <div class="widget">
           <h4><span class="en">Groundnut · Anantapur mandi</span><span class="te">వేరుశనగ · అనంతపురం మార్కెట్</span></h4>
-          <div class="price-line"><span><span class="en">Today</span><span class="te">ఈరోజు</span></span><span class="val">₹6,150 / qtl</span></div>
-          <div class="price-line"><span><span class="en">Yesterday</span><span class="te">నిన్న</span></span><span class="val">₹6,080 / qtl</span></div>
-          <div class="price-line"><span><span class="en">7-day avg.</span><span class="te">7-రోజుల సగటు</span></span><span class="val">₹6,020 / qtl</span></div>
+          <div id="adv-price-body">
+            <div class="price-line"><span><span class="en">Loading…</span><span class="te">లోడ్ అవుతోంది…</span></span><span class="val">—</span></div>
+          </div>
         </div>
         <div class="widget">
           <h4><span class="en">Advisory</span><span class="te">సలహా</span></h4>
           <div class="pest-alert">
             <svg class="ic" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L2 21h20L12 3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v5M12 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            <span><span class="en">Leaf-spot risk is rising in groundnut with this week's humidity — check the underside of leaves early morning.</span><span class="te">ఈ వారం తేమ కారణంగా వేరుశనగలో ఆకుమచ్చ ప్రమాదం పెరుగుతోంది — ఉదయం ఆకుల అడుగుభాగాన్ని పరిశీలించండి.</span></span>
+            <span id="adv-pest"><span class="en">Loading…</span><span class="te">లోడ్ అవుతోంది…</span></span>
           </div>
         </div>
       </div>
-      <p class="note" style="margin-top:16px;">
-        <span class="en">Illustrative sample — a live version would pull daily from IMD and AgMarknet.</span>
-        <span class="te">ఇది ఉదాహరణ మాత్రమే — ప్రత్యక్ష వెర్షన్ IMD, AgMarknet నుండి ప్రతిరోజూ డేటా తీసుకుంటుంది.</span>
+      <p class="note" style="margin-top:16px;" id="adv-source-note">
+        <span class="en">Weather from live forecast data · groundnut price from the government Agmarknet portal.</span>
+        <span class="te">వాతావరణం ప్రత్యక్ష సూచన డేటా నుండి · వేరుశనగ ధర ప్రభుత్వ Agmarknet పోర్టల్ నుండి.</span>
       </p>
     </div>
   </section>
@@ -932,9 +932,55 @@
     }catch(e){ /* silently ignore; user can retry */ }
   }
 
+  /* ---------- daily advisory (weather + mandi price + pest rule) ---------- */
+  async function renderAdvisory(){
+    var tempEl = document.getElementById('adv-temp');
+    var condEl = document.getElementById('adv-condition');
+    var rainEl = document.getElementById('adv-rain');
+    var priceEl = document.getElementById('adv-price-body');
+    var pestEl = document.getElementById('adv-pest');
+    var noteEl = document.getElementById('adv-source-note');
+    if(!tempEl) return;
+
+    try{
+      var res = await fetch('/api/advisory');
+      if(!res.ok) throw new Error('bad response');
+      var data = await res.json();
+
+      if(data.weather){
+        tempEl.textContent = Math.round(data.weather.tempC) + '°';
+        condEl.innerHTML = '<span class="en">' + data.weather.conditionEn + '</span><span class="te">' + data.weather.conditionTe + '</span>';
+        var rc = (data.weather.rainChance === null || data.weather.rainChance === undefined) ? '—' : data.weather.rainChance + '%';
+        rainEl.innerHTML = '<span class="en">Rain chance: ' + rc + '</span><span class="te">వర్షం అవకాశం: ' + rc + '</span>';
+      } else {
+        condEl.innerHTML = '<span class="en">Weather unavailable right now</span><span class="te">వాతావరణం ప్రస్తుతం అందుబాటులో లేదు</span>';
+      }
+
+      if(data.price){
+        priceEl.innerHTML =
+          '<div class="price-line"><span><span class="en">Today</span><span class="te">ఈరోజు</span></span><span class="val">₹' + data.price.today.toLocaleString('en-IN') + ' / qtl</span></div>' +
+          (data.price.yesterday ? '<div class="price-line"><span><span class="en">Yesterday</span><span class="te">నిన్న</span></span><span class="val">₹' + data.price.yesterday.toLocaleString('en-IN') + ' / qtl</span></div>' : '') +
+          (data.price.weekAvg ? '<div class="price-line"><span><span class="en">7-day avg.</span><span class="te">7-రోజుల సగటు</span></span><span class="val">₹' + data.price.weekAvg.toLocaleString('en-IN') + ' / qtl</span></div>' : '');
+      } else {
+        priceEl.innerHTML = '<div class="price-line"><span><span class="en">Price data unavailable</span><span class="te">ధర డేటా అందుబాటులో లేదు</span></span><span class="val">—</span></div>';
+      }
+
+      if(data.advisory){
+        pestEl.innerHTML = '<span class="en">' + data.advisory.en + '</span><span class="te">' + data.advisory.te + '</span>';
+      }
+
+      noteEl.innerHTML =
+        '<span class="en">Weather from live forecast data · groundnut price from the government Agmarknet portal' + (data.price && data.price.asOf ? (' (as of ' + data.price.asOf + ')') : '') + ' · pest advisory generated from this week\'s weather.</span>' +
+        '<span class="te">వాతావరణం ప్రత్యక్ష సూచన డేటా నుండి · వేరుశనగ ధర ప్రభుత్వ Agmarknet పోర్టల్ నుండి · తెగుళ్ల సలహా ఈ వారం వాతావరణం ఆధారంగా రూపొందించబడింది.</span>';
+    } catch(e){
+      condEl.innerHTML = '<span class="en">Couldn\'t load today\'s data — try refreshing.</span><span class="te">ఈరోజు డేటా లోడ్ కాలేదు — మళ్ళీ ప్రయత్నించండి.</span>';
+    }
+  }
+
   /* ---------- init ---------- */
   renderLocalRows();
   renderRecentReports();
+  renderAdvisory();
 </script>
 
 </body>
