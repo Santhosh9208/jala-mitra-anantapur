@@ -92,34 +92,72 @@ export default async (req: Request, context: Context) => {
   }
 
   // --- Mandi price (Agmarknet via data.gov.in, needs a free API key) ---
+  // NOTE: we deliberately don't filter by `market` server-side — Agmarknet's
+  // market names often carry a suffix ("Anantapur APMC", "Anantapur(Urban)"
+  // etc.) that varies, so an exact filter can silently return nothing. We
+  // fetch by state+commodity (values that are consistent) and match the
+  // market ourselves.
   const apiKey = process.env.AGMARKNET_API_KEY;
   if (apiKey) {
     try {
       const url =
         `https://api.data.gov.in/resource/${MANDI_RESOURCE_ID}` +
-        `?api-key=${encodeURIComponent(apiKey)}&format=json&limit=50` +
+        `?api-key=${encodeURIComponent(apiKey)}&format=json&limit=500` +
         `&filters[state]=${encodeURIComponent("Andhra Pradesh")}` +
-        `&filters[market]=${encodeURIComponent("Anantapur")}` +
         `&filters[commodity]=${encodeURIComponent("Groundnut")}`;
       const pRes = await fetch(url);
       if (!pRes.ok) throw new Error("price fetch failed");
       const pData = await pRes.json();
-      const records: any[] = Array.isArray(pData.records) ? pData.records : [];
+      const all: any[] = Array.isArray(pData.records) ? pData.records : [];
+
+      // Prefer an exact match on the Anantapur market; fall back to any
+      // market name containing "anantapur"; fall back to the whole state.
+      let records = all.filter((r) => String(r.market || "").toLowerCase() === "anantapur");
+      let scope: "market" | "district" | "state" = "market";
+      if (records.length === 0) {
+        records = all.filter((r) => String(r.market || "").toLowerCase().includes("anantapur"));
+        scope = "market";
+      }
+      if (records.length === 0) {
+        records = all.filter((r) => String(r.district || "").toLowerCase().includes("anantapur"));
+        scope = "district";
+      }
+      if (records.length === 0) {
+        records = all;
+        scope = "state";
+      }
+
       records.sort((a, b) => parseDMY(b.arrival_date) - parseDMY(a.arrival_date));
 
-      const today = records[0];
-      const yesterday = records[1];
-      const week = records.slice(0, 7).filter((r) => r.modal_price);
-      const weekAvg = week.length
-        ? Math.round(week.reduce((s, r) => s + Number(r.modal_price || 0), 0) / week.length)
-        : null;
+      // Collapse multiple markets/varieties reported on the same date into
+      // one average per date, so "today" isn't just whichever record
+      // happened to sort first.
+      const byDate = new Map<string, number[]>();
+      records.forEach((r) => {
+        if (!r.modal_price) return;
+        const key = r.arrival_date;
+        if (!byDate.has(key)) byDate.set(key, []);
+        byDate.get(key)!.push(Number(r.modal_price));
+      });
+      const dates = Array.from(byDate.keys()).sort((a, b) => parseDMY(b) - parseDMY(a));
+      const avgFor = (d: string) => {
+        const vals = byDate.get(d) || [];
+        return vals.length ? Math.round(vals.reduce((s, v) => s + v, 0) / vals.length) : null;
+      };
 
-      result.price = today
+      const todayDate = dates[0];
+      const yesterdayDate = dates[1];
+      const weekDates = dates.slice(0, 7);
+      const weekVals = weekDates.map(avgFor).filter((v): v is number => v !== null);
+      const weekAvg = weekVals.length ? Math.round(weekVals.reduce((s, v) => s + v, 0) / weekVals.length) : null;
+
+      result.price = todayDate
         ? {
-            today: Number(today.modal_price),
-            yesterday: yesterday ? Number(yesterday.modal_price) : null,
+            today: avgFor(todayDate),
+            yesterday: yesterdayDate ? avgFor(yesterdayDate) : null,
             weekAvg,
-            asOf: today.arrival_date,
+            asOf: todayDate,
+            scope, // "market" = Anantapur itself, "district" = Anantapur district, "state" = AP-wide average
           }
         : null;
     } catch {
