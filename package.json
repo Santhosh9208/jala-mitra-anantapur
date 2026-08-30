@@ -1,0 +1,11 @@
+{
+  "name": "jala-mitra-anantapur",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "@netlify/blobs": "^10.7.9"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^6.0.0"
+  }
+}
