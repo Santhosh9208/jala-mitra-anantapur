@@ -961,6 +961,11 @@
           '<div class="price-line"><span><span class="en">Today</span><span class="te">ఈరోజు</span></span><span class="val">₹' + data.price.today.toLocaleString('en-IN') + ' / qtl</span></div>' +
           (data.price.yesterday ? '<div class="price-line"><span><span class="en">Yesterday</span><span class="te">నిన్న</span></span><span class="val">₹' + data.price.yesterday.toLocaleString('en-IN') + ' / qtl</span></div>' : '') +
           (data.price.weekAvg ? '<div class="price-line"><span><span class="en">7-day avg.</span><span class="te">7-రోజుల సగటు</span></span><span class="val">₹' + data.price.weekAvg.toLocaleString('en-IN') + ' / qtl</span></div>' : '');
+        if(data.price.scope === 'district'){
+          priceEl.innerHTML += '<div class="meta" style="margin-top:6px;"><span class="en">Anantapur market wasn\'t reporting — showing Anantapur district average.</span><span class="te">అనంతపురం మార్కెట్ డేటా లేదు — అనంతపురం జిల్లా సగటు చూపిస్తోంది.</span></div>';
+        } else if(data.price.scope === 'state'){
+          priceEl.innerHTML += '<div class="meta" style="margin-top:6px;"><span class="en">Anantapur data wasn\'t reporting — showing Andhra Pradesh state average.</span><span class="te">అనంతపురం డేటా లేదు — ఆంధ్రప్రదేశ్ రాష్ట్ర సగటు చూపిస్తోంది.</span></div>';
+        }
       } else {
         priceEl.innerHTML = '<div class="price-line"><span><span class="en">Price data unavailable</span><span class="te">ధర డేటా అందుబాటులో లేదు</span></span><span class="val">—</span></div>';
       }
