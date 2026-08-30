@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jala Mitra | జల మిత్ర — Anantapur Water &amp; Farming Community</title>
+<meta name="description" content="A bilingual, community-run water and farming tool for Anantapur — track borewells, share solutions, and stay informed, in English and Telugu.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='19' fill='%23e6dcc3' stroke='%2312707a' stroke-width='2'/%3E%3Cpath d='M20 8C13 18 10 22 10 27a10 10 0 0 0 20 0c0-5-3-9-10-19Z' fill='%2312707a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Telugu:wght@400;500;600;700&family=Noto+Serif+Telugu:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sand:        #e6dcc3;
+    --sand-deep:   #d8caa4;
+    --ink:         #251d14;
+    --ink-soft:    #5b5140;
+    --rust:        #b5501f;
+    --rust-deep:   #8f3c15;
+    --teal:        #12707a;
+    --teal-deep:   #0b4b52;
+    --teal-pale:   #cfe6e4;
+    --olive:       #6e7a3a;
+    --card:        #f1e9d3;
+    --line:        rgba(37,29,20,0.16);
+    --ok:          #4c7a3a;
+    --warn:        #b5801f;
+    --bad:         #a83a2a;
+    --radius:      14px;
+    --disp: 'Bricolage Grotesque', 'Noto Serif Telugu', serif;
+    --body: 'Work Sans', 'Noto Sans Telugu', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--sand);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  :lang(te){ font-family:'Noto Sans Telugu', var(--body); }
+  h1:lang(te), h2:lang(te), h3:lang(te), .disp:lang(te){ font-family:'Noto Serif Telugu', var(--disp); }
+
+  img,svg{max-width:100%;display:block;}
+  a{color:inherit;}
+
+  /* ---------- language toggling ---------- */
+  .te{ display:none; }
+  body.show-te .en{ display:none; }
+  body.show-te .te{ display:block; }
+  body.show-te span.te{ display:inline; }
+  body.show-te span.en{ display:none; }
+
+  .wrap{ max-width:1120px; margin:0 auto; padding:0 28px; }
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(230,220,195,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .header-inner{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px; max-width:1120px; margin:0 auto; gap:16px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; font-family:var(--disp); font-weight:700; font-size:1.25rem; }
+  .brand .mark{ width:30px; height:30px; flex:none; }
+  .brand small{ display:block; font-family:var(--body); font-weight:500; font-size:0.62rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); }
+
+  nav.primary{ display:flex; gap:22px; font-size:0.92rem; font-weight:500; }
+  nav.primary a{ text-decoration:none; color:var(--ink-soft); border-bottom:2px solid transparent; padding-bottom:2px; }
+  nav.primary a:hover{ color:var(--ink); border-color:var(--rust); }
+
+  .lang-toggle{ display:flex; border:1.5px solid var(--ink); border-radius:999px; overflow:hidden; font-family:var(--mono); font-size:0.78rem; font-weight:600; }
+  .lang-toggle button{
+    border:0; background:transparent; padding:7px 14px; cursor:pointer; color:var(--ink);
+  }
+  .lang-toggle button[aria-pressed="true"]{ background:var(--ink); color:var(--sand); }
+
+  @media (max-width:820px){
+    nav.primary{ display:none; }
+  }
+
+  /* ---------- hero ---------- */
+  .hero{ padding:64px 0 40px; }
+  .hero-grid{ display:grid; grid-template-columns:1.05fr 0.95fr; gap:48px; align-items:center; }
+  @media (max-width:900px){ .hero-grid{ grid-template-columns:1fr; } }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--mono); font-size:0.76rem; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--teal-deep); background:var(--teal-pale); border-radius:999px; padding:6px 12px 6px 10px; margin-bottom:20px;
+  }
+  .eyebrow .dot{ width:7px; height:7px; border-radius:50%; background:var(--teal); }
+
+  h1{
+    font-family:var(--disp); font-weight:700; letter-spacing:-0.01em;
+    font-size:clamp(2.1rem, 4.4vw, 3.1rem); line-height:1.06; margin:0 0 22px;
+  }
+  h1 .accent{ color:var(--teal); }
+
+  .lede{ font-size:1.09rem; color:var(--ink-soft); max-width:46ch; margin:0 0 30px; }
+
+  .cta-row{ display:flex; flex-wrap:wrap; gap:14px; }
+  .btn{
+    font-family:var(--body); font-weight:600; font-size:0.95rem; border-radius:10px;
+    padding:13px 22px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+    border:1.5px solid transparent; cursor:pointer;
+  }
+  .btn-primary{ background:var(--teal); color:#fff; }
+  .btn-primary:hover{ background:var(--teal-deep); }
+  .btn-ghost{ background:transparent; border-color:var(--ink); color:var(--ink); }
+  .btn-ghost:hover{ background:var(--ink); color:var(--sand); }
+
+  /* ---------- signature well illustration ---------- */
+  .well-wrap{ position:relative; }
+  .well-caption{
+    font-family:var(--mono); font-size:0.74rem; color:var(--ink-soft); text-align:center; margin-top:10px;
+  }
+
+  /* ---------- stat strip ---------- */
+  .stats{ border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--sand-deep); }
+  .stats .wrap{ display:grid; grid-template-columns:repeat(3,1fr); gap:0; }
+  .stat{ padding:28px 22px; text-align:left; border-left:1px solid var(--line); }
+  .stat:first-child{ border-left:0; }
+  .stat .num{ font-family:var(--mono); font-weight:600; font-size:1.7rem; color:var(--rust); }
+  .stat .lbl{ font-size:0.86rem; color:var(--ink-soft); margin-top:4px; max-width:26ch; }
+  @media (max-width:700px){
+    .stats .wrap{ grid-template-columns:1fr; }
+    .stat{ border-left:0; border-top:1px solid var(--line); }
+    .stat:first-child{ border-top:0; }
+  }
+
+  /* ---------- sections ---------- */
+  section{ padding:64px 0; }
+  section.alt{ background:var(--card); }
+  .sec-head{ max-width:62ch; margin-bottom:36px; }
+  .sec-eyebrow{ font-family:var(--mono); font-size:0.76rem; text-transform:uppercase; letter-spacing:.06em; color:var(--rust-deep); margin-bottom:8px; }
+  h2{ font-family:var(--disp); font-size:clamp(1.5rem,2.6vw,2rem); margin:0 0 10px; letter-spacing:-.01em; }
+  .sec-sub{ color:var(--ink-soft); font-size:1rem; }
+
+  /* ---------- water board ---------- */
+  .board-card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    overflow:hidden;
+  }
+  table.board{ width:100%; border-collapse:collapse; font-size:0.92rem; }
+  table.board th{
+    text-align:left; font-family:var(--mono); font-weight:600; font-size:0.72rem; text-transform:uppercase; letter-spacing:.04em;
+    color:var(--ink-soft); padding:14px 16px; border-bottom:1px solid var(--line); background:var(--sand-deep);
+  }
+  table.board td{ padding:13px 16px; border-bottom:1px solid var(--line); vertical-align:top; }
+  table.board tr:last-child td{ border-bottom:0; }
+  .status{
+    display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:0.78rem; font-weight:600; padding:4px 10px; border-radius:999px;
+  }
+  .status .d{ width:7px; height:7px; border-radius:50%; }
+  .status.ok{ background:rgba(76,122,58,0.14); color:var(--ok); }
+  .status.ok .d{ background:var(--ok); }
+  .status.warn{ background:rgba(181,128,31,0.15); color:var(--warn); }
+  .status.warn .d{ background:var(--warn); }
+  .status.bad{ background:rgba(168,58,42,0.14); color:var(--bad); }
+  .status.bad .d{ background:var(--bad); }
+  .meta{ color:var(--ink-soft); font-size:0.82rem; }
+  .src-tag{ font-family:var(--mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:.03em; }
+  .demo-tag{ color:var(--ink-soft); opacity:0.7; }
+  .local-tag{ color:var(--teal-deep); font-weight:600; }
+  .row-del{ border:0; background:transparent; color:var(--bad); cursor:pointer; font-family:var(--mono); font-size:0.72rem; margin-left:8px; padding:0; text-decoration:underline; }
+
+  .board-footer{
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    padding:16px 18px; background:var(--sand-deep); border-top:1px solid var(--line);
+  }
+  .note{ font-size:0.8rem; color:var(--ink-soft); font-style:italic; }
+
+  /* ---------- report form ---------- */
+  .report-form{ display:none; padding:20px 18px; border-top:1px solid var(--line); background:var(--sand); }
+  .report-form.open{ display:block; }
+  .report-form .grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:14px; }
+  @media (max-width:800px){ .report-form .grid{ grid-template-columns:1fr 1fr; } }
+  .field label{ display:block; font-family:var(--mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); margin-bottom:6px; }
+  .field input, .field select{
+    width:100%; padding:9px 10px; border:1.5px solid var(--line); border-radius:8px; background:#fff; font-family:var(--body); font-size:0.9rem; color:var(--ink);
+  }
+  .form-msg{ font-size:0.85rem; color:var(--teal-deep); font-weight:600; margin-top:8px; min-height:1.2em; }
+
+  /* ---------- action cards ---------- */
+  .cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  @media (max-width:900px){ .cards{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:620px){ .cards{ grid-template-columns:1fr; } }
+  .card{
+    background:var(--sand); border:1px solid var(--line); border-radius:var(--radius); padding:22px;
+    display:flex; flex-direction:column; gap:12px;
+  }
+  section.alt .card{ background:#fff; }
+  .card .tag{ font-family:var(--mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--teal-deep); }
+  .card h3{ font-family:var(--disp); font-size:1.12rem; margin:0; }
+  .card p{ font-size:0.92rem; color:var(--ink-soft); margin:0; }
+  .steps{ list-style:none; margin:6px 0 0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .steps li{ display:flex; gap:10px; font-size:0.87rem; }
+  .steps li .n{ font-family:var(--mono); font-weight:600; color:var(--rust); flex:none; }
+
+  /* ---------- advisory widgets ---------- */
+  .advisory-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  @media (max-width:900px){ .advisory-grid{ grid-template-columns:1fr; } }
+  .widget{ background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:20px; }
+  .widget h4{ font-family:var(--mono); text-transform:uppercase; font-size:0.72rem; letter-spacing:.05em; color:var(--ink-soft); margin:0 0 14px; }
+  .weather-row{ display:flex; align-items:center; gap:14px; }
+  .weather-row .temp{ font-family:var(--mono); font-size:2.1rem; font-weight:600; color:var(--rust); }
+  .weather-row .desc{ font-size:0.88rem; color:var(--ink-soft); }
+  .price-line{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--line); font-size:0.9rem; }
+  .price-line:last-child{ border-bottom:0; }
+  .price-line .val{ font-family:var(--mono); font-weight:600; }
+  .pest-alert{ display:flex; gap:10px; align-items:flex-start; font-size:0.88rem; }
+  .pest-alert .ic{ width:20px; height:20px; flex:none; color:var(--warn); }
+
+  /* ---------- schemes accordion ---------- */
+  .accordion{ display:flex; flex-direction:column; gap:10px; }
+  .acc-item{ border:1px solid var(--line); border-radius:12px; background:var(--sand); overflow:hidden; }
+  .acc-item summary{
+    cursor:pointer; list-style:none; padding:16px 18px; display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--disp); font-weight:600; font-size:1rem;
+  }
+  .acc-item summary::-webkit-details-marker{ display:none; }
+  .acc-item summary .plus{ font-family:var(--mono); color:var(--teal); font-size:1.1rem; }
+  .acc-item[open] summary .plus{ transform:rotate(45deg); }
+  .acc-body{ padding:0 18px 18px; color:var(--ink-soft); font-size:0.92rem; max-width:70ch; }
+
+  /* ---------- report problem ---------- */
+  .report-panel{
+    background:var(--ink); color:var(--sand); border-radius:20px; padding:44px; display:grid; grid-template-columns:1fr 1fr; gap:36px;
+  }
+  @media (max-width:800px){ .report-panel{ grid-template-columns:1fr; padding:30px; } }
+  .report-panel h2{ color:var(--sand); }
+  .report-panel .sec-sub{ color:rgba(230,220,195,0.72); }
+  .report-panel .field label{ color:rgba(230,220,195,0.6); }
+  .report-panel .field input, .report-panel .field select, .report-panel .field textarea{
+    background:rgba(230,220,195,0.08); border:1.5px solid rgba(230,220,195,0.25); color:var(--sand);
+  }
+  .report-panel .field textarea{ width:100%; min-height:80px; padding:9px 10px; border-radius:8px; font-family:var(--body); font-size:0.9rem; resize:vertical; }
+  .report-panel .btn-primary{ background:var(--teal); }
+  .full-field{ margin-top:12px; }
+  .confirm{ display:none; margin-top:14px; font-size:0.88rem; color:#a9d8b8; font-weight:600; }
+  .confirm.show{ display:block; }
+
+  /* ---------- footer ---------- */
+  footer{ padding:48px 0 60px; border-top:1px solid var(--line); }
+  .foot-grid{ display:flex; justify-content:space-between; gap:30px; flex-wrap:wrap; }
+  .foot-about{ max-width:52ch; font-size:0.9rem; color:var(--ink-soft); }
+  .foot-brand{ font-family:var(--disp); font-weight:700; font-size:1.1rem; margin-bottom:10px; }
+  .foot-credit{ font-family:var(--mono); font-size:0.76rem; color:var(--ink-soft); margin-top:26px; }
+
+  .skip-link{ position:absolute; left:-999px; top:0; background:var(--ink); color:var(--sand); padding:10px 16px; z-index:100; }
+  .skip-link:focus{ left:10px; top:10px; }
+
+  a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-visible{
+    outline:3px solid var(--teal); outline-offset:2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ transition:none !important; animation:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="20" cy="20" r="19" stroke="#12707a" stroke-width="2"/>
+        <path d="M20 8 C13 18 10 22 10 27 a10 10 0 0 0 20 0 C30 22 27 18 20 8Z" fill="#12707a"/>
+      </svg>
+      <div>
+        <span class="en">Jala Mitra</span><span class="te">జల మిత్ర</span>
+        <small class="en">Anantapur · community water &amp; farming</small>
+        <small class="te">అనంతపురం · సామాజిక నీటి &amp; వ్యవసాయ కార్యక్రమం</small>
+      </div>
+    </div>
+    <nav class="primary">
+      <a href="#board"><span class="en">Water Board</span><span class="te">నీటి పట్టిక</span></a>
+      <a href="#act"><span class="en">Do It Ourselves</span><span class="te">మనమే చేద్దాం</span></a>
+      <a href="#advisory"><span class="en">Farm Advisory</span><span class="te">వ్యవసాయ సమాచారం</span></a>
+      <a href="#schemes"><span class="en">Schemes</span><span class="te">పథకాలు</span></a>
+      <a href="#report"><span class="en">Report</span><span class="te">నివేదించండి</span></a>
+    </nav>
+    <div class="lang-toggle" role="group" aria-label="Choose language">
+      <button id="btn-en" aria-pressed="true" onclick="setLang('en')">EN</button>
+      <button id="btn-te" aria-pressed="false" onclick="setLang('te')">TE</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow"><span class="dot"></span>
+          <span class="en">A community water &amp; farming initiative for Anantapur</span>
+          <span class="te">అనంతపురం కోసం ఒక సామాజిక నీటి, వ్యవసాయ కార్యక్రమం</span>
+        </div>
+        <h1>
+          <span class="en">The water table is falling faster than the <span class="accent">rain returns.</span></span>
+          <span class="te">వర్షం తిరిగి వచ్చే వేగం కంటే <span class="accent">నీటిమట్టం</span> వేగంగా పడిపోతోంది.</span>
+        </h1>
+        <p class="lede">
+          <span class="en">Anantapur gets the second-lowest rainfall of any district in India. The fix doesn't start with the next government scheme — it starts with villages tracking their own borewells, sharing seed, and sharing the load.</span>
+          <span class="te">భారతదేశంలో అత్యల్ప వర్షపాతం ఉన్న జిల్లాల్లో అనంతపురం రెండవది. దీనికి పరిష్కారం తదుపరి ప్రభుత్వ పథకంతో మొదలవదు — ఇది గ్రామాలు తమ బోర్‌వెల్స్‌ను స్వయంగా గమనించడం, విత్తనాలు పంచుకోవడం, భారాన్ని పంచుకోవడంతో మొదలవుతుంది.</span>
+        </p>
+        <div class="cta-row">
+          <a href="#report" class="btn btn-primary">
+            <span class="en">Report a dry borewell</span><span class="te">ఎండిన బోర్‌వెల్‌ను తెలియజేయండి</span>
+          </a>
+          <a href="#board" class="btn btn-ghost">
+            <span class="en">See the water board</span><span class="te">నీటి పట్టిక చూడండి</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="well-wrap">
+        <svg viewBox="0 0 380 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cross-section illustration of a well showing the water table dropping over three decades">
+          <!-- ground strata -->
+          <rect x="0" y="40" width="380" height="380" fill="#d8caa4"/>
+          <rect x="0" y="40" width="380" height="120" fill="#e6dcc3"/>
+          <rect x="0" y="160" width="380" height="14" fill="#c7b789"/>
+          <rect x="0" y="300" width="380" height="10" fill="#b7a578"/>
+          <!-- rock texture dots -->
+          <g fill="#b7a578" opacity="0.5">
+            <circle cx="40" cy="190" r="3"/><circle cx="90" cy="230" r="3"/><circle cx="150" cy="200" r="3"/>
+            <circle cx="230" cy="260" r="3"/><circle cx="290" cy="210" r="3"/><circle cx="340" cy="250" r="3"/>
+            <circle cx="60" cy="330" r="3"/><circle cx="180" cy="350" r="3"/><circle cx="300" cy="340" r="3"/>
+          </g>
+          <!-- well shaft -->
+          <rect x="168" y="46" width="44" height="368" fill="#251d14"/>
+          <rect x="176" y="46" width="28" height="368" fill="#f1e9d3"/>
+          <!-- 1995 water line -->
+          <line x1="176" y1="150" x2="204" y2="150" stroke="#12707a" stroke-width="4"/>
+          <rect x="176" y="150" width="28" height="264" fill="#cfe6e4"/>
+          <!-- 2025 water line (much lower) -->
+          <line x1="176" y1="330" x2="204" y2="330" stroke="#0b4b52" stroke-width="4"/>
+          <rect x="176" y="330" width="28" height="84" fill="#12707a"/>
+          <!-- labels -->
+          <text x="214" y="154" font-family="JetBrains Mono, monospace" font-size="13" fill="#12707a" font-weight="600">1995</text>
+          <text x="214" y="334" font-family="JetBrains Mono, monospace" font-size="13" fill="#0b4b52" font-weight="600">2025</text>
+          <!-- surface -->
+          <rect x="0" y="30" width="380" height="10" fill="#6e7a3a"/>
+          <g fill="#6e7a3a">
+            <path d="M20 30 q5 -14 10 0Z"/><path d="M60 30 q5 -12 10 0Z"/><path d="M110 30 q5 -16 10 0Z"/>
+            <path d="M250 30 q5 -12 10 0Z"/><path d="M300 30 q5 -15 10 0Z"/><path d="M350 30 q5 -11 10 0Z"/>
+          </g>
+        </svg>
+        <p class="well-caption">
+          <span class="en">A typical Anantapur well — the water line has dropped roughly 180 feet in one generation.</span>
+          <span class="te">అనంతపురంలో ఒక సాధారణ బావి — ఒక తరంలోనే నీటిమట్టం సుమారు 180 అడుగులు పడిపోయింది.</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="wrap">
+      <div class="stat">
+        <div class="num">520–560mm</div>
+        <div class="lbl"><span class="en">avg. annual rainfall — 2nd lowest of any district in India</span><span class="te">సగటు వార్షిక వర్షపాతం — భారతదేశంలో రెండవ అత్యల్పం</span></div>
+      </div>
+      <div class="stat">
+        <div class="num">~90%</div>
+        <div class="lbl"><span class="en">of cultivated land is rainfed and chronically drought-prone</span><span class="te">సాగు భూమిలో వర్షాధారమైనది, తరచూ కరువుకు గురయ్యేది</span></div>
+      </div>
+      <div class="stat">
+        <div class="num"><span class="en">Falling</span><span class="te">పడిపోతోంది</span></div>
+        <div class="lbl"><span class="en">groundwater table across most mandals, borewell by borewell</span><span class="te">చాలా మండలాల్లో నీటిమట్టం, బోర్‌వెల్ బోర్‌వెల్‌గా</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WATER BOARD -->
+  <section id="board">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-eyebrow"><span class="en">01 · Live from the village</span><span class="te">01 · గ్రామం నుండి ప్రత్యక్షంగా</span></div>
+        <h2><span class="en">The Water Board</span><span class="te">నీటి పట్టిక</span></h2>
+        <p class="sec-sub">
+          <span class="en">Every row here comes from someone in the village — not a government survey. When a handpump breaks, report it so the water-user group and neighbours know before someone walks three kilometres for nothing.</span>
+          <span class="te">ఇక్కడ ప్రతి వరుస గ్రామంలోని వ్యక్తి నుండి వచ్చినదే — ప్రభుత్వ సర్వే కాదు. హ్యాండ్‌పంప్ పాడైతే, ఎవరైనా వృథాగా మూడు కిలోమీటర్లు నడవకముందే నీటి వినియోగదారుల బృందానికి, పొరుగువారికి తెలిసేలా ఇక్కడ తెలియజేయండి.</span>
+        </p>
+      </div>
+
+      <div class="board-card">
+        <table class="board">
+          <thead>
+            <tr>
+              <th><span class="en">Village</span><span class="te">గ్రామం</span></th>
+              <th><span class="en">Water point</span><span class="te">నీటి కేంద్రం</span></th>
+              <th><span class="en">Status</span><span class="te">స్థితి</span></th>
+              <th><span class="en">Reported by</span><span class="te">తెలియజేసినవారు</span></th>
+            </tr>
+          </thead>
+          <tbody id="board-body">
+            <tr data-source="demo">
+              <td>Bukkapatnam</td>
+              <td><span class="en">Handpump — Gandhi Nagar</span><span class="te">హ్యాండ్‌పంప్ — గాంధీ నగర్</span></td>
+              <td><span class="status ok"><span class="d"></span><span class="en">Working</span><span class="te">పనిచేస్తోంది</span></span></td>
+              <td class="meta">Lakshmi · <span class="en">2 days ago</span><span class="te">2 రోజుల క్రితం</span> · <span class="src-tag demo-tag"><span class="en">demo</span><span class="te">మాదిరి</span></span></td>
+            </tr>
+            <tr data-source="demo">
+              <td>Kanaganapalle</td>
+              <td><span class="en">Borewell — School Road</span><span class="te">బోర్‌వెల్ — స్కూల్ రోడ్</span></td>
+              <td><span class="status warn"><span class="d"></span><span class="en">Needs repair</span><span class="te">మరమ్మతు అవసరం</span></span></td>
+              <td class="meta">Ramesh · <span class="en">5 days ago</span><span class="te">5 రోజుల క్రితం</span> · <span class="src-tag demo-tag"><span class="en">demo</span><span class="te">మాదిరి</span></span></td>
+            </tr>
+            <tr data-source="demo">
+              <td>Rapthadu</td>
+              <td><span class="en">Community open well</span><span class="te">సామాజిక బావి</span></td>
+              <td><span class="status bad"><span class="d"></span><span class="en">Dry</span><span class="te">ఎండిపోయింది</span></span></td>
+              <td class="meta">Venkatesh · <span class="en">1 day ago</span><span class="te">1 రోజు క్రితం</span> · <span class="src-tag demo-tag"><span class="en">demo</span><span class="te">మాదిరి</span></span></td>
+            </tr>
+            <tr data-source="demo">
+              <td>Tadipatri</td>
+              <td><span class="en">Handpump — Bus Stand</span><span class="te">హ్యాండ్‌పంప్ — బస్ స్టాండ్</span></td>
+              <td><span class="status ok"><span class="d"></span><span class="en">Working</span><span class="te">పనిచేస్తోంది</span></span></td>
+              <td class="meta">Anjali · <span class="en">Today</span><span class="te">ఈరోజు</span> · <span class="src-tag demo-tag"><span class="en">demo</span><span class="te">మాదిరి</span></span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="board-footer">
+          <span class="note" id="board-count-note">
+            <span class="en">Sample data shown for demonstration — a real village deploys this with its own reports.</span>
+            <span class="te">ప్రదర్శన కోసం మాదిరి డేటా చూపబడింది — నిజమైన గ్రామం తన సొంత నివేదికలతో దీన్ని ఉపయోగిస్తుంది.</span>
+          </span>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-ghost" style="padding:9px 16px;font-size:0.85rem;" onclick="toggleForm()">
+              <span class="en">+ Report a water point</span><span class="te">+ నీటి కేంద్రాన్ని తెలియజేయండి</span>
+            </button>
+          </div>
+        </div>
+        <div class="note" style="padding:0 18px 16px;">
+          <span class="en">Entries you add below are saved centrally and visible to <em>everyone who visits this site</em> — no import or export needed.</span>
+          <span class="te">మీరు దిగువన జోడించే ఎంట్రీలు కేంద్రంగా సేవ్ అయి, <em>ఈ సైట్‌ను సందర్శించే అందరికీ</em> కనిపిస్తాయి — దిగుమతి లేదా ఎగుమతి అవసరం లేదు.</span>
+        </div>
+        <div class="report-form" id="report-form">
+          <div class="grid">
+            <div class="field">
+              <label><span class="en">Village</span><span class="te">గ్రామం</span></label>
+              <input id="f-village" type="text" placeholder="e.g. Dharmavaram">
+            </div>
+            <div class="field">
+              <label><span class="en">Water point</span><span class="te">నీటి కేంద్రం</span></label>
+              <input id="f-point" type="text" placeholder="e.g. Handpump — Temple St.">
+            </div>
+            <div class="field">
+              <label><span class="en">Status</span><span class="te">స్థితి</span></label>
+              <select id="f-status">
+                <option value="ok">Working</option>
+                <option value="warn">Needs repair</option>
+                <option value="bad">Dry</option>
+              </select>
+            </div>
+            <div class="field">
+              <label><span class="en">Your name</span><span class="te">మీ పేరు</span></label>
+              <input id="f-name" type="text" placeholder="e.g. Suresh">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="submitBoard()">
+            <span class="en">Add to the board</span><span class="te">పట్టికకు జోడించండి</span>
+          </button>
+          <div class="form-msg" id="board-msg"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DO IT OURSELVES -->
+  <section id="act" class="alt">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-eyebrow"><span class="en">02 · No department required</span><span class="te">02 · శాఖ అవసరం లేదు</span></div>
+        <h2><span class="en">Do It Ourselves</span><span class="te">మనమే చేద్దాం</span></h2>
+        <p class="sec-sub">
+          <span class="en">Five things a village can start this month, with no budget and no sanction letter.</span>
+          <span class="te">ఈ నెలలోనే ఒక గ్రామం బడ్జెట్ లేకుండా, ఎలాంటి అనుమతి లేఖ లేకుండా మొదలుపెట్టగల ఐదు పనులు.</span>
+        </p>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="tag"><span class="en">Water</span><span class="te">నీరు</span></div>
+          <h3><span class="en">Water User Group</span><span class="te">నీటి వినియోగదారుల బృందం</span></h3>
+          <p><span class="en">A small rotating group looks after one water point, so repairs happen in days, not months.</span><span class="te">ఒక చిన్న బృందం వంతుల వారీగా ఒక నీటి కేంద్రాన్ని చూసుకుంటుంది — మరమ్మతులు నెలల్లో కాదు, రోజుల్లో జరుగుతాయి.</span></p>
+          <ol class="steps">
+            <li><span class="n">1</span><span><span class="en">Gather 5–8 households sharing one point</span><span class="te">ఒక నీటి కేంద్రాన్ని పంచుకునే 5–8 కుటుంబాలను చేర్చండి</span></span></li>
+            <li><span class="n">2</span><span><span class="en">Agree a small monthly contribution (₹10–20)</span><span class="te">నెలవారీ చిన్న వాటా (₹10–20) నిర్ణయించండి</span></span></li>
+            <li><span class="n">3</span><span><span class="en">Keep one shared contact for repairs</span><span class="te">మరమ్మతుల కోసం ఒక ఉమ్మడి సంప్రదింపు వ్యక్తిని ఉంచండి</span></span></li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <div class="tag"><span class="en">Seed</span><span class="te">విత్తనం</span></div>
+          <h3><span class="en">Community Seed Bank</span><span class="te">సామాజిక విత్తన బ్యాంకు</span></h3>
+          <p><span class="en">Store and share drought-hardy local seed instead of buying water-hungry hybrid seed every season.</span><span class="te">ప్రతి సీజన్‌లో నీరు ఎక్కువగా అవసరమయ్యే హైబ్రిడ్ విత్తనాలు కొనే బదులు, కరువును తట్టుకునే స్థానిక విత్తనాలను నిల్వ చేసి పంచుకోండి.</span></p>
+          <ol class="steps">
+            <li><span class="n">1</span><span><span class="en">Pick one trusted house to store seed</span><span class="te">విత్తనాలు నిల్వ చేయడానికి ఒక నమ్మకమైన ఇంటిని ఎంచుకోండి</span></span></li>
+            <li><span class="n">2</span><span><span class="en">Farmers deposit surplus seed after harvest</span><span class="te">పంట తర్వాత మిగులు విత్తనాన్ని రైతులు జమ చేస్తారు</span></span></li>
+            <li><span class="n">3</span><span><span class="en">Borrow now, return double next harvest</span><span class="te">ఇప్పుడు తీసుకోండి, తర్వాతి పంటలో రెట్టింపు తిరిగివ్వండి</span></span></li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <div class="tag"><span class="en">Income</span><span class="te">ఆదాయం</span></div>
+          <h3><span class="en">Farmer Producer Collective</span><span class="te">రైతు ఉత్పత్తిదారుల సంఘం</span></h3>
+          <p><span class="en">Selling together gets a fairer price than selling alone to the middleman.</span><span class="te">మధ్యవర్తికి ఒంటరిగా అమ్మడం కంటే కలిసి అమ్మితే మంచి ధర వస్తుంది.</span></p>
+          <ol class="steps">
+            <li><span class="n">1</span><span><span class="en">10+ farmers register as an informal group</span><span class="te">10కి పైగా రైతులు అనధికారిక బృందంగా నమోదవుతారు</span></span></li>
+            <li><span class="n">2</span><span><span class="en">Pool produce for one buyer, not many</span><span class="te">అనేకమంది కొనుగోలుదారుల బదులు ఒకరికే పంటను కలిపి ఇవ్వండి</span></span></li>
+            <li><span class="n">3</span><span><span class="en">Negotiate one fair price for everyone</span><span class="te">అందరికీ ఒకే న్యాయమైన ధరను చర్చించండి</span></span></li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <div class="tag"><span class="en">Labour</span><span class="te">శ్రమ</span></div>
+          <h3><span class="en">Labour-Sharing Circle</span><span class="te">శ్రమదాన బృందం</span></h3>
+          <p><span class="en">Take turns working each other's fields at sowing and harvest, so no one has to hire labour they can't afford.</span><span class="te">విత్తనాలు వేసేటప్పుడు, పంట కోసేటప్పుడు ఒకరి పొలంలో మరొకరు వంతుల వారీగా పనిచేయండి — భరించలేని కూలీని ఎవరూ పెట్టుకోవాల్సిన అవసరం ఉండదు.</span></p>
+          <ol class="steps">
+            <li><span class="n">1</span><span><span class="en">List everyone's sowing/harvest dates</span><span class="te">అందరి విత్తన/కోత తేదీలను జాబితా చేయండి</span></span></li>
+            <li><span class="n">2</span><span><span class="en">Rotate as a group, field by field</span><span class="te">బృందంగా, పొలం పొలంగా వంతులు మారండి</span></span></li>
+            <li><span class="n">3</span><span><span class="en">No cash changes hands — only turns</span><span class="te">డబ్బు మారదు — వంతులు మాత్రమే</span></span></li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <div class="tag"><span class="en">Organising</span><span class="te">నిర్వహణ</span></div>
+          <h3><span class="en">SHG-Led Monitoring</span><span class="te">స్వయం సహాయక బృంద పర్యవేక్షణ</span></h3>
+          <p><span class="en">Women's Self-Help Groups already meet weekly — add water-point and price updates to that meeting.</span><span class="te">మహిళా స్వయం సహాయక బృందాలు ఇప్పటికే వారానికోసారి సమావేశమవుతాయి — ఆ సమావేశంలోనే నీటి కేంద్రం, ధరల సమాచారాన్ని జోడించండి.</span></p>
+          <ol class="steps">
+            <li><span class="n">1</span><span><span class="en">Add 5 minutes to the regular meeting</span><span class="te">సాధారణ సమావేశానికి 5 నిమిషాలు జోడించండి</span></span></li>
+            <li><span class="n">2</span><span><span class="en">One member updates the Water Board</span><span class="te">ఒక సభ్యురాలు నీటి పట్టికను నవీకరిస్తారు</span></span></li>
+            <li><span class="n">3</span><span><span class="en">Share updates on the group's phone chat</span><span class="te">బృంద ఫోన్ చాట్‌లో నవీకరణలను పంచుకోండి</span></span></li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <div class="tag"><span class="en">Knowledge</span><span class="te">జ్ఞానం</span></div>
+          <h3><span class="en">Returning-Migrant Circle</span><span class="te">వలస నుండి తిరిగొచ్చినవారి బృందం</span></h3>
+          <p><span class="en">Workers who migrate for the season often learn new skills elsewhere — organise a way to share that knowledge when they return.</span><span class="te">సీజన్‌లో వలస వెళ్లే కార్మికులు తరచుగా కొత్త నైపుణ్యాలు నేర్చుకుంటారు — తిరిగి వచ్చినప్పుడు ఆ జ్ఞానాన్ని పంచుకునే మార్గాన్ని ఏర్పాటు చేయండి.</span></p>
+          <ol class="steps">
+            <li><span class="n">1</span><span><span class="en">Note who migrates and what they learn</span><span class="te">ఎవరు వలస వెళ్తారో, ఏమి నేర్చుకుంటారో గమనించండి</span></span></li>
+            <li><span class="n">2</span><span><span class="en">Host one sharing session after each return</span><span class="te">ప్రతిసారి తిరిగొచ్చాక ఒక పంచుకునే సమావేశం పెట్టండి</span></span></li>
+            <li><span class="n">3</span><span><span class="en">Log useful skills on the Water Board page</span><span class="te">ఉపయోగకరమైన నైపుణ్యాలను నీటి పట్టిక పేజీలో నమోదు చేయండి</span></span></li>
+          </ol>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ADVISORY -->
+  <section id="advisory">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-eyebrow"><span class="en">03 · Same info, in your hand</span><span class="te">03 · అదే సమాచారం, మీ చేతిలో</span></div>
+        <h2><span class="en">Daily Farm Advisory</span><span class="te">దైనందిన వ్యవసాయ సమాచారం</span></h2>
+        <p class="sec-sub">
+          <span class="en">Weather, price and pest information already exists on government portals — this just puts it somewhere simple, in Telugu, on one screen.</span>
+          <span class="te">వాతావరణం, ధర, తెగుళ్ల సమాచారం ఇప్పటికే ప్రభుత్వ పోర్టళ్లలో ఉంది — దీన్ని తెలుగులో, ఒకే స్క్రీన్‌పై సులభంగా అందించడమే ఇక్కడ చేస్తున్నది.</span>
+        </p>
+      </div>
+      <div class="advisory-grid">
+        <div class="widget">
+          <h4><span class="en">Today · Anantapur</span><span class="te">ఈరోజు · అనంతపురం</span></h4>
+          <div class="weather-row">
+            <div class="temp">34°</div>
+            <div class="desc">
+              <div><span class="en">Clear, hot</span><span class="te">స్పష్టం, వేడిగా</span></div>
+              <div class="meta"><span class="en">Rain chance: 8%</span><span class="te">వర్షం అవకాశం: 8%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="widget">
+          <h4><span class="en">Groundnut · Anantapur mandi</span><span class="te">వేరుశనగ · అనంతపురం మార్కెట్</span></h4>
+          <div class="price-line"><span><span class="en">Today</span><span class="te">ఈరోజు</span></span><span class="val">₹6,150 / qtl</span></div>
+          <div class="price-line"><span><span class="en">Yesterday</span><span class="te">నిన్న</span></span><span class="val">₹6,080 / qtl</span></div>
+          <div class="price-line"><span><span class="en">7-day avg.</span><span class="te">7-రోజుల సగటు</span></span><span class="val">₹6,020 / qtl</span></div>
+        </div>
+        <div class="widget">
+          <h4><span class="en">Advisory</span><span class="te">సలహా</span></h4>
+          <div class="pest-alert">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L2 21h20L12 3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v5M12 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span><span class="en">Leaf-spot risk is rising in groundnut with this week's humidity — check the underside of leaves early morning.</span><span class="te">ఈ వారం తేమ కారణంగా వేరుశనగలో ఆకుమచ్చ ప్రమాదం పెరుగుతోంది — ఉదయం ఆకుల అడుగుభాగాన్ని పరిశీలించండి.</span></span>
+          </div>
+        </div>
+      </div>
+      <p class="note" style="margin-top:16px;">
+        <span class="en">Illustrative sample — a live version would pull daily from IMD and AgMarknet.</span>
+        <span class="te">ఇది ఉదాహరణ మాత్రమే — ప్రత్యక్ష వెర్షన్ IMD, AgMarknet నుండి ప్రతిరోజూ డేటా తీసుకుంటుంది.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- SCHEMES -->
+  <section id="schemes" class="alt">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-eyebrow"><span class="en">04 · In plain words</span><span class="te">04 · సులభమైన మాటల్లో</span></div>
+        <h2><span class="en">Know Your Schemes</span><span class="te">పథకాలు తెలుసుకోండి</span></h2>
+        <p class="sec-sub">
+          <span class="en">A short, plain-language explanation of support that already exists — confirm current details at your nearest Rythu Bharosa Kendram before applying.</span>
+          <span class="te">ఇప్పటికే ఉన్న సహాయం గురించి సులభమైన వివరణ — దరఖాస్తు చేయడానికి ముందు మీ సమీప రైతు భరోసా కేంద్రంలో వివరాలను నిర్ధారించుకోండి.</span>
+        </p>
+      </div>
+      <div class="accordion">
+        <details class="acc-item" open>
+          <summary><span><span class="en">PM-KISAN</span><span class="te">పీఎం-కిసాన్</span></span><span class="plus">+</span></summary>
+          <div class="acc-body">
+            <span class="en">Direct income support paid to landholding farmer families in instalments through the year, meant to help with routine input costs.</span>
+            <span class="te">భూమి ఉన్న రైతు కుటుంబాలకు ఏడాది పొడవునా వాయిదాల్లో నేరుగా చెల్లించే ఆదాయ సహాయం — సాధారణ ఖర్చులకు తోడ్పడేందుకు.</span>
+          </div>
+        </details>
+        <details class="acc-item">
+          <summary><span><span class="en">PMFBY — Crop Insurance</span><span class="te">పీఎంఎఫ్‌బీవై — పంట బీమా</span></span><span class="plus">+</span></summary>
+          <div class="acc-body">
+            <span class="en">Insurance against crop loss from drought, pests, or unseasonal weather, at a modest premium share for the farmer.</span>
+            <span class="te">కరువు, తెగుళ్లు లేదా అకాల వాతావరణం వల్ల పంట నష్టానికి బీమా — రైతు చెల్లించాల్సిన ప్రీమియం వాటా తక్కువగా ఉంటుంది.</span>
+          </div>
+        </details>
+        <details class="acc-item">
+          <summary><span><span class="en">MGNREGA</span><span class="te">ఉపాధి హామీ పథకం</span></span><span class="plus">+</span></summary>
+          <div class="acc-body">
+            <span class="en">Guaranteed rural employment days on public works — useful income during the dry, lean months between harvests.</span>
+            <span class="te">ప్రజాపనులలో హామీ ఇవ్వబడిన గ్రామీణ ఉపాధి రోజులు — పంటల మధ్య ఎండిన, ఖాళీ నెలల్లో ఉపయోగకరమైన ఆదాయం.</span>
+          </div>
+        </details>
+        <details class="acc-item">
+          <summary><span><span class="en">AP Farmer Investment Support</span><span class="te">ఏపీ రైతు పెట్టుబడి సహాయం</span></span><span class="plus">+</span></summary>
+          <div class="acc-body">
+            <span class="en">State-level input-cost support for farming families, disbursed each season — ask your Rythu Bharosa Kendram for the current scheme name and amount.</span>
+            <span class="te">రైతు కుటుంబాలకు ప్రతి సీజన్‌లో ఇచ్చే రాష్ట్ర స్థాయి పెట్టుబడి సహాయం — ప్రస్తుత పథకం పేరు, మొత్తం కోసం మీ రైతు భరోసా కేంద్రాన్ని అడగండి.</span>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- REPORT -->
+  <section id="report">
+    <div class="wrap">
+      <div class="report-panel">
+        <div>
+          <div class="sec-eyebrow" style="color:#9fd6cf;"><span class="en">05 · Tell your village</span><span class="te">05 · మీ గ్రామానికి తెలియజేయండి</span></div>
+          <h2><span class="en">Report a problem</span><span class="te">ఒక సమస్యను తెలియజేయండి</span></h2>
+          <p class="sec-sub">
+            <span class="en">Not just water — a broken road, a delayed payment, a school issue. One place for the village to see what's pending.</span>
+            <span class="te">నీరు మాత్రమే కాదు — పాడైన రోడ్డు, ఆలస్యమైన చెల్లింపు, పాఠశాల సమస్య. గ్రామంలో ఏమి పెండింగ్‌లో ఉందో చూడటానికి ఒకే స్థలం.</span>
+          </p>
+        </div>
+        <div>
+          <div class="field">
+            <label><span class="en">Type of problem</span><span class="te">సమస్య రకం</span></label>
+            <select id="r-type">
+              <option value="en">Water point</option>
+              <option>Road</option>
+              <option>Farm input / seed</option>
+              <option>Payment or scheme delay</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field full-field">
+            <label><span class="en">Describe it briefly</span><span class="te">క్లుప్తంగా వివరించండి</span></label>
+            <textarea id="r-desc" placeholder="What's wrong, and where?"></textarea>
+          </div>
+          <div class="field full-field">
+            <label><span class="en">Village &amp; your name</span><span class="te">గ్రామం &amp; మీ పేరు</span></label>
+            <input id="r-who" type="text" placeholder="e.g. Singanamala — Padma">
+          </div>
+          <div style="margin-top:16px;">
+            <button class="btn btn-primary" onclick="submitReport()">
+              <span class="en">Submit report</span><span class="te">నివేదికను పంపండి</span>
+            </button>
+          </div>
+          <div class="confirm" id="report-confirm">
+            <span class="en">✓ Logged. Your water-user group or SHG contact will see this at the next meeting.</span>
+            <span class="te">✓ నమోదైంది. తదుపరి సమావేశంలో మీ నీటి బృందం లేదా SHG సంప్రదింపు వ్యక్తి దీన్ని చూస్తారు.</span>
+          </div>
+          <div id="recent-reports" style="margin-top:22px;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="foot-brand"><span class="en">Jala Mitra</span><span class="te">జల మిత్ర</span></div>
+      <p class="foot-about">
+        <span class="en">A prototype community tool proposed for the "Local Sustainability Innovation Challenge" case study (Sustainability and Society, BAHUM110) — built around Anantapur's groundwater depletion and agrarian distress, and designed to be run by villages, water-user groups and SHGs, not a government department. Telugu text is a working draft; a local reviewer should refine it before real use.</span>
+        <span class="te">"లోకల్ సస్టెయినబిలిటీ ఇన్నోవేషన్ ఛాలెంజ్" కేస్ స్టడీ (సస్టెయినబిలిటీ అండ్ సొసైటీ, BAHUM110) కోసం ప్రతిపాదించిన ఒక నమూనా సామాజిక సాధనం — అనంతపురం భూగర్భజల క్షీణత, వ్యవసాయ సంక్షోభం చుట్టూ రూపొందించబడింది; దీన్ని ప్రభుత్వ శాఖ కాదు, గ్రామాలు, నీటి వినియోగదారుల బృందాలు, SHGలు నడపాలి. తెలుగు వచనం ఒక ప్రాథమిక ముసాయిదా — వాడకానికి ముందు స్థానిక సమీక్షకుడు దీన్ని మెరుగుపరచాలి.</span>
+      </p>
+      <div class="foot-credit">K. Sai Santhosh Reddy · 25BYB0201 · BAHUM110</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  var BOARD_KEY = 'jalaMitra_board_v1';
+  var REPORT_KEY = 'jalaMitra_reports_v1';
+  var statusMap = {
+    ok:   {cls:'ok',   en:'Working',      te:'పనిచేస్తోంది'},
+    warn: {cls:'warn', en:'Needs repair', te:'మరమ్మతు అవసరం'},
+    bad:  {cls:'bad',  en:'Dry',          te:'ఎండిపోయింది'}
+  };
+
+  function isTe(){ return document.body.classList.contains('show-te'); }
+
+  function setLang(lang){
+    document.body.classList.toggle('show-te', lang === 'te');
+    document.documentElement.lang = lang;
+    document.getElementById('btn-en').setAttribute('aria-pressed', lang === 'en');
+    document.getElementById('btn-te').setAttribute('aria-pressed', lang === 'te');
+  }
+
+  function toggleForm(){
+    document.getElementById('report-form').classList.toggle('open');
+  }
+
+  /* ---------- storage helpers (shared, via serverless API) ---------- */
+  async function loadBoard(){
+    try{
+      var res = await fetch('/api/board');
+      if(!res.ok) throw new Error('bad response');
+      return await res.json();
+    }catch(e){ return []; }
+  }
+  async function addBoardEntry(entry){
+    var res = await fetch('/api/board', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(entry)
+    });
+    if(!res.ok) throw new Error('failed to save');
+    return await res.json();
+  }
+  async function deleteBoardEntry(id){
+    var res = await fetch('/api/board?id=' + encodeURIComponent(id), { method:'DELETE' });
+    if(!res.ok) throw new Error('failed to delete');
+  }
+  async function loadReports(){
+    try{
+      var res = await fetch('/api/reports');
+      if(!res.ok) throw new Error('bad response');
+      return await res.json();
+    }catch(e){ return []; }
+  }
+  async function addReportEntry(entry){
+    var res = await fetch('/api/reports', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(entry)
+    });
+    if(!res.ok) throw new Error('failed to save');
+    return await res.json();
+  }
+
+  function timeAgo(iso){
+    var mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+    if(mins < 1) return {en:'just now', te:'ఇప్పుడే'};
+    if(mins < 60) return {en:mins + ' min ago', te:mins + ' నిమిషాల క్రితం'};
+    var hrs = Math.round(mins/60);
+    if(hrs < 24) return {en:hrs + ' hr ago', te:hrs + ' గంటల క్రితం'};
+    var days = Math.round(hrs/24);
+    return {en:days + ' day(s) ago', te:days + ' రోజుల క్రితం'};
+  }
+
+  function rowHTML(entry, source){
+    var s = statusMap[entry.status] || statusMap.ok;
+    var t = timeAgo(entry.time);
+    var tagClass = source === 'demo' ? 'demo-tag' : 'local-tag';
+    var tagEn = source === 'demo' ? 'demo' : 'shared';
+    var tagTe = source === 'demo' ? 'మాదిరి' : 'పంచుకున్నది';
+    var delBtn = source === 'demo' ? '' :
+      ' <button class="row-del" onclick="deleteRow(' + entry.id + ')">' +
+        '<span class="en">remove</span><span class="te">తీసివేయి</span></button>';
+    return '<tr data-source="' + source + '" data-id="' + entry.id + '">' +
+      '<td>' + escapeHtml(entry.village) + '</td>' +
+      '<td>' + escapeHtml(entry.point) + '</td>' +
+      '<td><span class="status ' + s.cls + '"><span class="d"></span>' +
+        '<span class="en">' + s.en + '</span><span class="te">' + s.te + '</span></span></td>' +
+      '<td class="meta">' + escapeHtml(entry.name) + ' · ' +
+        '<span class="en">' + t.en + '</span><span class="te">' + t.te + '</span> · ' +
+        '<span class="src-tag ' + tagClass + '"><span class="en">' + tagEn + '</span><span class="te">' + tagTe + '</span></span>' +
+        delBtn +
+      '</td></tr>';
+  }
+
+  function escapeHtml(str){
+    var d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  async function renderLocalRows(){
+    var body = document.getElementById('board-body');
+    var existing = body.querySelectorAll('tr[data-source="live"]');
+    existing.forEach(function(tr){ tr.remove(); });
+    var list = await loadBoard();
+    list.slice().reverse().forEach(function(entry){
+      body.insertAdjacentHTML('afterbegin', rowHTML(entry, 'live'));
+    });
+    updateCountNote(list.length);
+  }
+
+  function updateCountNote(n){
+    var note = document.getElementById('board-count-note');
+    if(n > 0){
+      note.innerHTML =
+        '<span class="en">' + n + ' report(s) shared by the community, plus 4 sample rows below.</span>' +
+        '<span class="te">సమాజం పంచుకున్న ' + n + ' నివేదికలు, దిగువన 4 మాదిరి వరుసలు కూడా ఉన్నాయి.</span>';
+    } else {
+      note.innerHTML =
+        '<span class="en">Sample data shown for demonstration — real reports from your community will appear here too.</span>' +
+        '<span class="te">ప్రదర్శన కోసం మాదిరి డేటా చూపబడింది — మీ సమాజం నుండి నిజమైన నివేదికలు కూడా ఇక్కడ కనిపిస్తాయి.</span>';
+    }
+  }
+
+  async function submitBoard(){
+    var village = document.getElementById('f-village').value.trim();
+    var point = document.getElementById('f-point').value.trim();
+    var status = document.getElementById('f-status').value;
+    var name = document.getElementById('f-name').value.trim();
+    var msg = document.getElementById('board-msg');
+
+    if(!village || !point || !name){
+      msg.style.color = '#a83a2a';
+      msg.textContent = isTe() ? 'దయచేసి అన్ని వివరాలు నింపండి.' : 'Please fill in all the fields.';
+      return;
+    }
+
+    msg.style.color = '#0b4b52';
+    msg.textContent = isTe() ? 'సేవ్ చేస్తోంది…' : 'Saving…';
+
+    try{
+      await addBoardEntry({ village: village, point: point, status: status, name: name });
+      await renderLocalRows();
+      msg.style.color = '#0b4b52';
+      msg.textContent = isTe() ? 'పట్టికకు జోడించబడింది — అందరూ దీన్ని చూడగలరు. ధన్యవాదాలు!' : 'Added to the board — everyone can see it now. Thank you!';
+      document.getElementById('f-village').value = '';
+      document.getElementById('f-point').value = '';
+      document.getElementById('f-name').value = '';
+    }catch(e){
+      msg.style.color = '#a83a2a';
+      msg.textContent = isTe() ? 'సేవ్ చేయడంలో సమస్య వచ్చింది — మళ్ళీ ప్రయత్నించండి.' : 'Something went wrong saving that — please try again.';
+    }
+  }
+
+  async function deleteRow(id){
+    try{
+      await deleteBoardEntry(id);
+      await renderLocalRows();
+    }catch(e){ /* leave the row in place if delete failed */ }
+  }
+
+  /* ---------- report problem ---------- */
+  async function renderRecentReports(){
+    var all = await loadReports();
+    var list = all.slice(-5).reverse();
+    var el = document.getElementById('recent-reports');
+    if(list.length === 0){ el.innerHTML = ''; return; }
+    var rows = list.map(function(r){
+      var t = timeAgo(r.time);
+      return '<div style="padding:10px 0;border-top:1px solid rgba(230,220,195,0.18);font-size:0.85rem;">' +
+        '<strong>' + escapeHtml(r.who || '—') + '</strong> · ' + escapeHtml(r.type) +
+        ' <span style="opacity:0.6;">(<span class="en">' + t.en + '</span><span class="te">' + t.te + '</span>)</span>' +
+        '<div style="opacity:0.8;margin-top:2px;">' + escapeHtml(r.desc) + '</div></div>';
+    }).join('');
+    el.innerHTML =
+      '<div class="src-tag" style="opacity:0.6;margin-bottom:2px;"><span class="en">Recent, shared with the community</span><span class="te">ఇటీవలివి, సమాజంతో పంచుకున్నవి</span></div>' +
+      rows;
+  }
+
+  async function submitReport(){
+    var type = document.getElementById('r-type').value;
+    var desc = document.getElementById('r-desc').value.trim();
+    var who = document.getElementById('r-who').value.trim();
+    if(!desc){ return; }
+    try{
+      await addReportEntry({ type: type, desc: desc, who: who });
+      document.getElementById('report-confirm').classList.add('show');
+      document.getElementById('r-desc').value = '';
+      document.getElementById('r-who').value = '';
+      await renderRecentReports();
+    }catch(e){ /* silently ignore; user can retry */ }
+  }
+
+  /* ---------- init ---------- */
+  renderLocalRows();
+  renderRecentReports();
+</script>
+
+</body>
+</html>
